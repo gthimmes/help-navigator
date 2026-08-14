@@ -168,8 +168,9 @@ a live event log.
 ## Development
 
 ```sh
-npm test        # vitest: markdown, search, store, and jsdom UI tests
-npm run build   # tsup → dist/ (esm, cjs, iife, d.ts)
+npm test          # vitest: markdown, search, store unit tests + jsdom UI integration tests
+npm run test:e2e  # Playwright E2E against the demo page (starts the server itself)
+npm run build     # tsup → dist/ (esm, cjs, iife, d.ts)
 ```
 
 See [ROADMAP.md](./ROADMAP.md) for where this is headed.
