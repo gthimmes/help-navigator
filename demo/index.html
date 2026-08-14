@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>help-navigator demo</title>
+  <style>
+    :root { color-scheme: light dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f3f4f8;
+      color: #1c1e26;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+    }
+    aside {
+      background: #191b22;
+      color: #cfd3de;
+      padding: 20px 14px;
+    }
+    aside .brand { font-weight: 700; color: #fff; margin-bottom: 24px; padding: 0 8px; }
+    aside a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    aside a.active, aside a:hover { background: #2a2d38; color: #fff; }
+    main { padding: 36px 44px; max-width: 900px; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    .sub { color: #6b7280; margin: 0 0 28px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7ee;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .card b { display: block; font-size: 22px; margin-top: 6px; }
+    .card small { color: #6b7280; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    button.demo-btn {
+      font: inherit;
+      border: 1px solid #d6d9e2;
+      background: #fff;
+      border-radius: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+    button.demo-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+    .hint {
+      margin-top: 30px;
+      padding: 14px 16px;
+      background: #eef0ff;
+      border: 1px solid #d9dcff;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #3730a3;
+    }
+    code { background: #e8eaf2; border-radius: 5px; padding: 1px 5px; font-size: 0.9em; }
+    #event-log {
+      margin-top: 28px;
+      background: #14161c;
+      color: #9fe8b6;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      border-radius: 12px;
+      padding: 14px;
+      height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">⬢ Acme Analytics</div>
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Projects</a>
+    <a href="#">Reports</a>
+    <a href="#" id="nav-billing">Billing</a>
+    <a href="#">Settings</a>
+  </aside>
+  <main>
+    <h1>Dashboard</h1>
+    <p class="sub">A fake SaaS app hosting the <strong>help-navigator</strong> widget. Press <code>F1</code> or click the floating button.</p>
+
+    <div class="cards">
+      <div class="card"><small>Active projects</small><b>12</b></div>
+      <div class="card"><small>API calls today</small><b>48,211</b></div>
+      <div class="card"><small>Team members</small><b>9</b></div>
+    </div>
+
+    <h3>Try the API</h3>
+    <div class="row">
+      <button class="demo-btn" id="btn-open">help.open()</button>
+      <button class="demo-btn" id="btn-article">help.openArticle('export-data')</button>
+      <button class="demo-btn" id="btn-category">help.openCategory('billing')</button>
+      <button class="demo-btn" id="btn-search">help.search('invoice')</button>
+      <button class="demo-btn" data-help-open="two-factor">data-help-open="two-factor"</button>
+      <button class="demo-btn" id="btn-context">Simulate route change → billing context</button>
+    </div>
+
+    <div class="hint">
+      💡 The widget lives entirely in a shadow root, so none of this page's CSS leaks in
+      (and none of the widget's styles leak out). Click <em>Billing</em> in the sidebar to see
+      contextual suggestions change.
+    </div>
+
+    <div id="event-log">// widget events appear here…</div>
+  </main>
+
+  <script type="module">
+    import { HelpNavigator } from '../dist/index.js';
+    import { helpContent } from './content.js';
+
+    const logEl = document.getElementById('event-log');
+    const log = (msg) => {
+      logEl.textContent += `\n${msg}`;
+      logEl.scrollTop = logEl.scrollHeight;
+    };
+
+    const help = HelpNavigator.init({
+      content: helpContent,
+      position: 'bottom-right',
+      theme: 'auto',
+      accentColor: '#4f46e5',
+      hotkey: 'F1',
+      context: ['quick-start', 'keyboard-shortcuts'],
+    });
+
+    for (const ev of ['ready', 'open', 'close', 'navigate', 'search', 'feedback', 'error']) {
+      help.on(ev, (payload) => log(`${ev} ${JSON.stringify(payload)}`));
+    }
+
+    document.getElementById('btn-open').onclick = () => help.open();
+    document.getElementById('btn-article').onclick = () => help.openArticle('export-data');
+    document.getElementById('btn-category').onclick = () => help.openCategory('billing');
+    document.getElementById('btn-search').onclick = () => help.search('invoice');
+    document.getElementById('btn-context').onclick = () => {
+      help.setContext(['understanding-invoices', 'change-plan', 'payment-methods']);
+      log('setContext → billing articles');
+    };
+    document.getElementById('nav-billing').onclick = (e) => {
+      e.preventDefault();
+      help.setContext(['understanding-invoices', 'change-plan', 'payment-methods']);
+      log('route change: /billing → context updated');
+    };
+
+    window.help = help; // poke at it from the console
+  </script>
+</body>
+</html>

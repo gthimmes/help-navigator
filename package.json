@@ -1,0 +1,43 @@
+{
+  "name": "help-navigator",
+  "version": "0.1.0",
+  "description": "Framework-agnostic, embeddable in-app help center: floating launcher, slide-in panel, instant search, contextual help, safe markdown rendering. Zero dependencies.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "demo": "node demo/serve.mjs"
+  },
+  "keywords": [
+    "help",
+    "help-center",
+    "help-widget",
+    "knowledge-base",
+    "documentation",
+    "in-app-help",
+    "web-component"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}
