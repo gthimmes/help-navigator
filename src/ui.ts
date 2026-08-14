@@ -124,6 +124,7 @@ export class HelpUI {
     if (this.openState) return;
     this.openState = true;
     this.lastFocused = document.activeElement;
+    this.render();
     this.root.classList.add('hn-open');
     this.panel.removeAttribute('aria-hidden');
     this.panel.removeAttribute('inert');
@@ -143,6 +144,11 @@ export class HelpUI {
     const back = this.lastFocused as HTMLElement | null;
     if (back && typeof back.focus === 'function' && document.contains(back)) back.focus();
     else this.launcherBtn?.focus();
+    // Empty the panel once the slide-out finishes: hidden help text left in
+    // the DOM collides with host-page text queries (tests, find-in-page).
+    setTimeout(() => {
+      if (!this.openState) this.render();
+    }, 300);
   }
 
   toggle(): void {
@@ -324,6 +330,12 @@ export class HelpUI {
   private render(): void {
     const t = this.opts.texts;
     const view = this.current;
+
+    if (!this.openState) {
+      // Closed panel keeps no view content in the DOM (see close()).
+      this.bodyEl.innerHTML = '';
+      return;
+    }
 
     this.backBtn.hidden = this.stack.length <= 1;
     if (view.kind !== 'search' && this.searchInput.value && this.stack.every((v) => v.kind !== 'search')) {

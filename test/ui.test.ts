@@ -39,9 +39,11 @@ describe('HelpNavigator UI', () => {
     expect(document.querySelector('help-navigator-root')).toBeNull();
   });
 
-  it('renders inline content immediately after init', () => {
+  it('keeps view content out of the DOM until opened', () => {
     const help = HelpNavigator.init({ content });
-    expect(shadow().textContent).toContain('Basics');
+    expect(shadow().querySelector('.hn-body')!.textContent).not.toContain('Basics');
+    help.open();
+    expect(shadow().querySelector('.hn-body')!.textContent).toContain('Basics');
     help.destroy();
   });
 
