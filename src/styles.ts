@@ -77,10 +77,12 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   display: flex;
   flex-direction: column;
   box-shadow: var(--hn-shadow);
-  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  visibility: hidden;
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.28s;
   font-size: 14.5px;
   line-height: 1.55;
 }
+.hn-open .hn-panel { visibility: visible; transition-delay: 0s, 0s; }
 .hn-pos-right .hn-panel { right: 0; transform: translateX(calc(100% + 40px)); border-radius: var(--hn-radius) 0 0 var(--hn-radius); }
 .hn-pos-left .hn-panel { left: 0; transform: translateX(calc(-100% - 40px)); border-radius: 0 var(--hn-radius) var(--hn-radius) 0; }
 .hn-open .hn-panel { transform: translateX(0); }
